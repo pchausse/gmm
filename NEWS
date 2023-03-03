@@ -1,0 +1,244 @@
+Changes in version 1.6-2
+
+o Fixed a bug with iterative GMM from the previous version
+o Added the option onlyCoefficients=FALSE to gmm() and gel(). If set to TRUE, no covariance matrix is computed. Only the coefficients
+  objective and the lambdas (for gel only) are returned.
+o In previous versions, the HAC weighting matrix for linear models was computed without specifying that the first column of the
+  instrument matrix was a column of ones (with its name being "(Intercept)"). It makes a difference when computing the bandwidth with
+  bwNeweyWest. The new version, takes it into account. It is not possible to obtain the same sandwich covariance matrix with gmm and OLS.
+o In previous versions, the weighting matrix and, as a result, the standard errors were based on the small sample adjusted vcovHAC for weakly dependent
+  processes. The adjustment is not justified for GMM. The option adjust=FALSE is therefore added to vcovHAC in .myKernHAC()
+o Added a method getImpProb, which extract the implied probabilities. It allows  for negative probabilities as it often happens with CUE
+o lambda for CUE is solved analytically (it is minus the projection of gt on a vector of ones). The option RCue for optlam can be used to restrict the implied probabilities to be non-negative.
+
+Changes in version 1.6-1
+
+o Added the function bwWilhelm() to compute the optimal bandwidth of Wilhelm(2015).
+o The argument $vcov of tsls object is the Classical covariance matrix. vcov() must be used to obtain a different covariance
+o Changed the default value of prewhite to 1 in gmm() because it is recommended for HAC estimation
+o gmm with optfct="optimize" was generating an error message. It has been fixed
+o A new set of functions to estimate the average treatment effect by GEL have been added. See ?ATEgel
+o Some other minor bugs that were reported by users were fixed.
+
+Changes in version 1.6-0
+
+o tsls is now a real 2-stage least square. Before it was a 2-step optimal GMM with HCCM weighting matrix.
+o Fixed a typo in FinRes.R file. It was preventing to compute the proper vcov matrix for a very special case (fixed weights)
+o Added Helinger distance and Exponentially tilted Helinger estimator to gel()
+o Fixed the LR test of ETEL in gel()
+o Cleaned a lot of the codes. In particular, a single moment function and its gradiant function is used now.
+  There is also a common weighting matrix generator function. The main goal is to make it more flexible and give the possibility
+  of creating weighting matrix based on other assumption such as clustering.
+o For GEL with smooth=TRUE, the weights were not fixed which was creating problems of convergence. 
+o Add the option of fixing the value of some coefficient in gel as it as already the case for gmmm.
+o It is no possible to provide gmm with the gradiant function when constrOptim is used.
+o There is now an evalGmm() function to create a gmm object with a given fixed vector. Not estimation is done, but the bandwidth and weights
+  for the HAC estimator are generated. It is possible to give a different vector os parameters for the moment function and the weighting matrix.
+o There is also an evalGel(). You fix the parameters and only the lambda are computed.
+o Fixed NAMESPACE to avoid the notes given by CRAN.
+o Modified getDat to allow for ~1 as instruments. Useful for inference on the mean using empirical likelihood with gel(x~1,~1).
+o The Lambdas and specTest from gel are printed even if the model is just identified. It is consitent with gmm which prints the j-test
+  for just identified models. The reason if to allow evalGel to generate the Lamdbas for testing purpose.
+o confint.gxx() has been modified. It now create an object and a print method has been created as well.
+o confint.gel includes the possibility of building a confidence interval using the inversion of one of the three specification tests.
+  It is therefore possible de construct an Empirical Likelihood confidence interval as described in Owen 2001. See manual.
+o On the process to create a sysGmm for system og linear equations. The function sysGmm() will do the job. Not yet working.
+o getDat is modified so that the name of the dependent variable is the one included in the formula.
+o A set of functions have been added to estimate system of linear equations (this is a beta version not tested yet).
+o A set of labor data as been added to test the sysGmm function
+o A panel of  Macro data has been added.
+
+Changes in version 1.5-2
+
+o Added constrOptim to nonlinear gmm() with fixed W
+
+Changes in version 1.5-1
+
+o Added importFrom element
+o Added element df.residual to gmm objects to allow F-type linearHypothesis 
+o Removed the unnecessary ls estimations in the first stage 2SLS
+
+Changes in version 1.5-0
+
+o Thanks to Eric Zivot. Many improvements are based on his testings of the package.
+o Fixed many bugs for the case in which vcov is set to iid 
+o Added options to tsls(). There are options for different sandwich matrix when summary is called
+
+Changes in version 1.4-6
+
+o Added the possibility of providing data.frame() with formula to gel()
+
+Changes in version 1.4-5
+
+o Replaced the deprecated function real(), is.real() and as.real() by double()
+
+Changes in version 1.4-4
+
+o Fixed an instability problem when the model is just identified and wmatrix is set to "ident"
+
+Changes in version 1.4-3
+
+o Added the option "constrOptim" to optfct for nonlinear models
+o Added the option "eqConstFullVcov" to gmm() to allow the computation the covariance matrix of all coefficients including 
+  the constrained ones (see ?gmm for details and examples).
+o Removed the dependency on fBasics and replaced it with stabledist
+
+Changes in version 1.4-2
+
+o Bugs fixed when running gel() with smooth=T and g() begina nonlinear function
+o Now, print.gel() and print.summary.gel() repports the bandwidth when smooth=T
+
+Changes in version 1.4-0
+
+o The method for GMM-CUE has been modified. Before, the weights for the kernel estimation of the weighting matrix
+  were flexible inside the optimizer which was making the algorithm long and unstable. It is now fixed using either the starting 
+  values provided by the user (for linear cases) or the first step GMM. 
+o You can now trace the convergence of the iterative GMM with the option traceIter=T
+o The weights for the kernel are also fixed for iter-GMM. It is faster and I don't think it should change at each iteration. I am open to comments on that.
+o A function tsls() has been added to facilitate the estimation by 2SLS. The user does not have to worry about selecting the right gmm options
+o summary and print Methods have been added for tsls objects. The summary prints the f-statistics of the first stage LS
+o SmoothG for GEL uses now the kernapply() function which is more efficient.
+o Something the GMM converge to weird values which is sometimes caused by bad first step estimates used to compute the weighting matrix. 
+  Summary() prints the initial values to have more infortmation when convergence fails.
+o There was a bug in specTest() for GEL.  The degrees of freedom for the J-test were wrong. It is fixed.
+o For GEL type CUE the implied probabilities are computed according to Antoine, Bonnal, and Renault (2007) which solves the 
+  problem of negative probabilities.
+o The data file Finance has been resaved which implies that the package depends now on R version ­2.10.0 and higher
+o The function rho() had been changed to .rho() because it is not useful outside the gel() function
+o The function getLamb() has been modified. It is now more efficient. The default for the gel() option optlam is now nlminb.
+  The gradient and the hessian is provided which makes it much faster to solve for lambda. The argument of the function also changed.
+  Instead of providing the function g() and the vector of coefficients, we provide the matrix gt. I may be useful to call the function
+  sometimes to solve for lambda and it is easier that way.
+o The choice "iter" from the option optlam is kept for cases in which the optimizer fails to solve for lambda. It is often the case 
+  when type="ETEL" is chosen which tends to produce NA's.
+o For GEL of type "EL" and optfct="optim", the algorith constrOptim() is launched to make sure lambda'gt is always greater than 1
+  and avoid NA's when computing log(1-lambda'gt). The algorithm checks first with optim(), and swith to constrOptim() is optim() fails 
+o Sometimes, problems happen in GMM estimation because of the bad first step estimates used to compute the weighting matrix.
+  The first step estimates are usually computed using the identity matrix. The vector is now printed for better control. 
+o Cleaned the codes. The data are in object$dat and we can get the moment matrix by calling gt <- object$g(object$coef,object$dat) for linear and 
+  non-linear models, where object is of class gmm.
+o We can now impose equality constraints of the type theta_i=c_i with the option eqConst=. See help(gmm) which includes examples.
+o The K statistics for weakly identified models of Kleiberben (2005) has been added. See ?KTest.
+o (gmm only) The bandwidth for the HAC estimation is set by the first step estimate. Its value, along with the weights, 
+  is saved in attr(obj$w0,"Spec"). If the user is not satisfied with this automatic bw selection, bw can be set to any fixed number when
+  calling gmm(). See ?gmm for more details and examples.
+o The function gmmWithConst() reestimate an unrestricted model by imposing linear constraints, using the same specification. 
+  It also use the same bandwidth for the estimation of the HAC matrix
+o A regularized version of GEL based on Chausse(2011) is now implemented. The Lagrange multiplier can be regularized by setting the option
+  "alpha=" to a number. The regularization can stabilize the GEL estimator. A preliminary paper will be available on my web site that analyze 
+  the properties of such modification.  A method for selecting alpha will be implemented in future version.   
+
+Changes in version 1.3-8
+
+o A bug was found in the computation of linear GMM. The weighting matrix was not use properly. It is now fixed.
+
+Changes in version 1.3-7
+
+o Until now there was no way to know whether optim or nlminb has converged in case of nonlinear GMM. The convergence code
+  is now printed by print.gmm and the message and function evaluation by print.summary.gmm  
+o For cases in which the weighting matrix is provided, you have the choice of assuming that it is just a fixed matrix
+  not necessary equal to the inverse of the covariance matrix of the moment conditions (the default) or setting 
+  vcov="TrueFixed" if it is the inverse of the estimated covariance matrix.
+o If gradv is provided, it is not only used to compute the covariance matrix. It is also used to compute the 
+  gradiant of the objective function when the method is set to "CG" or "BFGS" in optim. For CUE, it is only used for the 
+  first step estimate because the gradiant can hardly be obtained analytically in that case.
+
+
+Changes in version 1.3-6
+
+o Bug fixed when estimating model with timeSeries objects
+o When NA were present in the data and the instruments, gmm() was not working when omitting them created different dimension. 
+  If by chance it created the same dimensions, the data were not correctly aligned. Now it is aligned and the observations
+  associated with the NA's are removed. When it happens, a warning message is displayed.     
+
+
+Changes in version 1.3-5
+
+o Bug fixed when estimating linear model with Z=X (OLS with robust matrix)
+
+Changes in version 1.3-4
+
+o It is now possible to enter the instruments in x either as a matrix 
+   (like before) or as a formula. See details and examples in gmm help  
+o  A data argument is added to the gmm function. Therefore, it is no longer required 
+   that the variables in data.frames be attached before using gmm(). You just need to add the option data=your_data.frame.   
+o  2SLS is now implemented in a more efficient way for linear models. Just add the option vcov="iid". An example as been included for that case 
+
+
+Changes in version 1.3-3
+
+ o It is a very small modification to avoid errors in the installation. The function linear.hypothesis of the car package is now deprecated. They have be changed to linearHypothesis. 
+
+
+Changes in version 1.3-2
+
+ o The functions HAC, weightsAndrews2, bwAndrews2 and all the others to compute the HAC matrix have been removed. The sandwich package is 
+   now used to compute these matrices.
+ o The option centeredVcov has beed added to the gmm function. It allows to compute the covariance matrix using a centered moment function. 
+ o The option weightsMatrix has beed added to the gmm function. It allows to fixe the matrix of weights.
+ o The methods bread() and estfun() are now available for gmm objects. It allows to compute a sandwich covariance matrix which 
+   is required if the weighting matrix is not the optimal one.
+ o The results are obtained even if the covariance matrix cannot be computed
+ o The vignette has been updated.
+
+Changes in version 1.3-0
+
+  o The method "getModel", "momentEstim" is now used also for the gel procedure.
+  o The GEL procedure as been modified. For the case in which the option smooth=TRUE is used, 
+    the appropriate scaling parameters have been added following Smith(2004) in the estimation, the covariance matrix of the Lagrange 
+    multiplier and the tests of over-identifying restrictions. In this case, only the kernels Truncated and Bartlett are available. 
+    For the former, the optimal bandwidth of Andrews(91) for Bartlett is used and for the latter, it is the bandwidth proposed
+    for the Parzen. See Smith(2004) for more details. Also, the option vcov as been removed since it is irrelevant for GEL. By setting smooth to
+    FALSE, it is implied that the data are iid.     
+
+Changes in version 1.2-0
+
+  o The new method specTest computes the specification tests from objects created by "gmm" or "gel" 
+  o The structure of the package has been modified in order to make it more flexible. The changes include:
+         o The new method "getModel" prepares the estimation. It creates what is required by the method "momentEstim".
+         o The method "momentEstim" estimates the model defined by "getModel"
+         o The method "FinRes" finalizes the estimation when it is needed. For now, the method is used only by "gmm" to compute the final resutls.
+  o Some bugs are fixed  
+  o The Vignette has been modified a little and the errors in the manual corrected.
+
+Changes in version 1.1-0
+
+  o The name of the vector of parameters is now "coefficients" instead of "par"
+  o The following methods are now available (see lm): fitted, residuals, vcov, coef, confint  
+  o There are now print methods for gmm, gel and summary.gel and summary.gmm
+  o These modifications allows to use linear.hypothesis from the car package so the function lintest is no longer needed and as been removed
+  o The following are now available from gmm and gel objects when g is a formula: residuals, fitted.values, model.frame, terms, model, the response and model matrix 
+  o Because the presence of the confint method, the option "interval" as been removed from the summary methods
+  o A new plot method is available for both gmm and gel objects. It is a beta version. Comments and suggestions are welcome.
+  o If there is only one instrument it can be provided as a vector. It does not need to be a matrix anymore. 
+  o It is now possible to select nlminb as optimizer. It allows to put restriction on the parameter space.
+  o The package no longer depends on mvtnorm. It is a suggested package as it is only required for examples.
+  o The packages car and fBasics (and therefore MASS, timeDate and timeSeries) are now suggested for examples in the vignette.
+  o The new function charStable has been added. It computes the characteristic function of a stable distribution. An example is shown in the vignette
+  o There was a bug when trying to estimate a model by ETEL with gel and numerical computation of lambda. It is fixed. Thanks to Márcio Laurini.
+  o The vignette as beed rewritten.
+
+Changes in Version 1.0-7
+
+  o Modified some functions to remove dependencies on tseries and sandwich packages
+  o Convert de Finance Data to data frame format 
+
+
+Changes in Version 1.0-6
+
+  o Some bugs fixed. Thanks to Justinas Brazys 
+
+Changes in Version 1.0-4
+
+  o documentation enhancements 
+
+  o Added finance data for applied examples 
+
+
+Changes in Version 1.0-3
+
+  o Some bugs fixed
+
+Changes in Version 1.0-2
+
+  o Added a new example for better understanding.

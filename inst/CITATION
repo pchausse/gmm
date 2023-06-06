@@ -7,6 +7,6 @@ bibentry("Article",
          volume      = "34",
          number      = "11",
          pages       = "1--35",
-         doi         = "/10.18637/jss.v034.i11",
+         doi         = "10.18637/jss.v034.i11",
          header     = "To cite gmm in publications use:"
 )

@@ -10,5 +10,7 @@ Depends: R (>= 2.10.0), sandwich
 NeedsCompilation: yes
 Suggests: knitr, mvtnorm, car, stabledist, MASS, timeDate, timeSeries
 Imports: stats, methods, grDevices, graphics
+URL: https://github.com/pchausse/gmm
+BugReports: https://github.com/pchausse/gmm/issues
 License: GPL (>= 2) 
 VignetteBuilder: knitr

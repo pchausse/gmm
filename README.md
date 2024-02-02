@@ -6,3 +6,5 @@
 
 # gmm
 Generalized method of Moments 
+
+The package is not updated here but on RForge: https://r-forge.r-project.org/projects/gmm/
